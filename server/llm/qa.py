@@ -5,14 +5,13 @@ import openai
 from langchain.prompts.chat import (
     ChatPromptTemplate,
     SystemMessagePromptTemplate,
-    AIMessagePromptTemplate,
     HumanMessagePromptTemplate,
 )
 from langchain_community.vectorstores.chroma import Chroma
 
 from langchain_openai import OpenAI
-from langchain.chains import RetrievalQA, ConversationalRetrievalChain, LLMChain
-from memory import get_history
+from langchain.chains import ConversationalRetrievalChain, LLMChain
+from tools.memory import get_history
 from langchain.memory import ConversationBufferMemory
 from dotenv import load_dotenv
 
