@@ -1,29 +1,17 @@
-# 首先实现基本配置
 import openai
 from langchain.vectorstores import Chroma  # 导入Chroma向量存储库
 from langchain.document_loaders import PyMuPDFLoader  # 导入PyMuPDFLoader文档加载库
 from langchain.text_splitter import RecursiveCharacterTextSplitter  # 导入RecursiveCharacterTextSplitter文本拆分库
 from langchain.document_loaders import UnstructuredMarkdownLoader  # 导入UnstructuredMarkdownLoader文档加载库
 from langchain.document_loaders import UnstructuredFileLoader  # 导入UnstructuredFileLoader文档加载库
-
 from langchain.embeddings.openai import OpenAIEmbeddings  # 导入OpenAIEmbeddings嵌入库
+import os
+from dotenv import load_dotenv
 
-from langchain.llms import OpenAI  # 导入OpenAI LLMS（Language Model Microservice）库
-import time
+load_dotenv()
+openai.api_key = os.getenv('OPENAI_API_KEY')
+openai.base_url = os.getenv('OPENAI_BASE_URL')
 
-# 使用前配置自己的 api 到环境变量中
-import os  # 导入os库
-
-from dotenv import load_dotenv, find_dotenv  # 导入dotenv库
-
-_ = load_dotenv(find_dotenv())  # 加载环境变量文件
-# 设置OpenAI的API密钥
-os.environ['OPENAI_API_KEY'] = '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'
-openai.api_key = os.environ['OPENAI_API_KEY']
-# sk-FT0qSwD4e5NsJWnr2bAaA30b0f3f4d1cBd5712Dd6e958010
-# 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 openai
-os.environ["HTTP_PROXY"] = "http://127.0.0.1:7890"
-os.environ["HTTPS_PROXY"] = "http://127.0.0.1:7890"
 # 指定 PDF 文件所在的文件夹路径
 folder_path = "../data_base/knowledge_db/pdf/"
 

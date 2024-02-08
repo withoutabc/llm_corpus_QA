@@ -1,20 +1,8 @@
 import asyncio
 import os
-import uuid
-from langchain.embeddings.openai import OpenAIEmbeddings
-from uuid import uuid4
-from langchain.chat_models import ChatOpenAI
 import openai
-from dotenv import load_dotenv, find_dotenv
-from langchain.agents import AgentType, Tool, initialize_agent
-from langchain.memory import ZepMemory
-from langchain.retrievers import ZepRetriever
-from langchain.schema import AIMessage, HumanMessage
-from langchain_community.utilities import WikipediaAPIWrapper
-from langchain_community.vectorstores.chroma import Chroma
-from langchain_openai import OpenAI
 from zep_python import NotFoundError, ZepClient
-from dotenv import load_dotenv, find_dotenv  # 导入dotenv库
+from dotenv import load_dotenv
 
 load_dotenv()
 ZEP_API_URL = os.getenv('ZEP_API_URL')

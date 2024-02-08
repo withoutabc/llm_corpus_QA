@@ -1,1 +1,4 @@
 /.env
+/server/llm/data_base/*
+
+/server/llm/data_base/

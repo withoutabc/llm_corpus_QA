@@ -1,12 +1,9 @@
-# app.py
+from server.service.user.login import *
+from server.service.user.register import *
+from server.service.user.refresh import *
 
-from flask import Flask
-from api_routes import create_hello_route
 
-app = Flask(__name__)
-
-# 导入路由和功能
-create_hello_route(app)
-
-if __name__ == '__main__':
-    app.run(debug=True)
+def join_user_routes(app):
+    create_login_route(app)
+    create_register_route(app)
+    create_refresh_route(app)

@@ -1,13 +1,16 @@
 param_error = "param error"
-interval_error = "interval error"
+internal_server_error = "internal server error"
+unauthorized_error = "unauthorized error"
+token_invalid = "token invalid"
 
-error_dict = {param_error: 20001,
-              interval_error: 50000,
-              }
+user_not_found = "user not found"
+success = 'success'
 
-
-def BaseResp(info: str):
-    base_resp = {}
-    base_resp["status"] = error_dict[param_error]
-    base_resp["info"] = param_error
-    return {"code"}
+error_dict = {
+    success: 0,
+    param_error: 20001,
+    internal_server_error: 50000,
+    unauthorized_error: 20002,
+    user_not_found: 40001,
+    token_invalid: 20002,
+}
