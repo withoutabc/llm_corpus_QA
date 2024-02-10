@@ -30,11 +30,11 @@ async def get_memory_async(session_id: str):
 
 
 
-# def get_history(session_id):
-#     history, memory = asyncio.run(get_memory_async(session_id))
-#     if history == None or memory == None:
-#         return None
-#     return history
+def get_history(session_id):
+    history, memory = asyncio.run(get_memory_async(session_id))
+    if history == None or memory == None:
+        return None
+    return history
 
 # def get_memory(session_id):
 #     history, memory = asyncio.run(get_memory_async(session_id))

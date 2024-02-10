@@ -1,3 +1,4 @@
+from server.llm.persist.retrieval import get_retrieval
 from tools.memory import *
 from flask import request, jsonify
 from tools.error import *
@@ -20,7 +21,7 @@ def create_chat_route(app):
 
         try:
             session_id = req['session_id']
-            content = req['content']
+            question = req['content']
             # 验证 session_id 是否为字符串
             if not isinstance(session_id, str):
                 return jsonify(base_resp(param_error))
@@ -31,4 +32,7 @@ def create_chat_route(app):
             print(f"An error occurred: {e}")
             return jsonify(base_resp(internal_server_error))
 
-        memory = history_transfer(session_id)
+        persist_dictionary = './../../llm/data_base/knowledge_db/'
+        retrieval = get_retrieval(persist_dictionary)
+
+
