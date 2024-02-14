@@ -1,10 +1,9 @@
-from server.llm.persist.retrieval import get_retrieval
-from tools.memory import *
-from flask import request, jsonify
+from flask import request
+
+from server.service.chain import get_chain
 from tools.error import *
 from tools.resp import base_resp
 from tools.memory import *
-from tools.history import get_zep_chat_history
 
 
 def create_chat_route(app):
@@ -21,6 +20,7 @@ def create_chat_route(app):
 
         try:
             session_id = req['session_id']
+            category = req['category']
             question = req['content']
             # 验证 session_id 是否为字符串
             if not isinstance(session_id, str):
@@ -32,7 +32,12 @@ def create_chat_route(app):
             print(f"An error occurred: {e}")
             return jsonify(base_resp(internal_server_error))
 
-        persist_dictionary = './../../llm/data_base/knowledge_db/'
-        retrieval = get_retrieval(persist_dictionary)
+        chain = get_chain(session_id, category)
+        res = chain.invoke(
+            input={"question": question}
+        )
 
-
+        resp = base_resp(success)
+        data = {"answer": res['result']}
+        resp['data'] = data
+        return jsonify(resp)

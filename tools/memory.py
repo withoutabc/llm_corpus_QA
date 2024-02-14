@@ -5,7 +5,6 @@ from flask import jsonify
 from langchain.memory import ConversationBufferMemory
 from zep_python import NotFoundError, ZepClient
 from dotenv import load_dotenv
-from server.init.zep_init import *
 
 load_dotenv()
 ZEP_API_URL = os.getenv('ZEP_API_URL')

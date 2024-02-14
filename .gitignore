@@ -1,3 +1,5 @@
 /.env
-/server/llm/data_base/
+/server/service/load/data_base/
 /.idea
+/knowledge_db
+/data_base
