@@ -1,4 +1,6 @@
 from flask import request, jsonify
+
+from server.service.history import get_zep_chat_history
 from tools.error import *
 from tools.resp import base_resp
 from tools.memory import *
@@ -29,9 +31,13 @@ def create_get_history_route(app):
             print(f"An error occurred: {e}")
             return jsonify(base_resp(internal_server_error))
 
-        history = get_history(session_id)
+        history = get_zep_chat_history(session_id)
         if history == None:
             return jsonify(base_resp(session_not_found))
         resp = base_resp(success)
-        resp['data'] = history
+
+        history_=[]
+        for message in history.zep_messages:
+            history_.append(message.to_dict())
+        resp['data'] = history_
         return jsonify(resp)

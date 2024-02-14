@@ -1,4 +1,4 @@
-from langchain.chains import ConversationalRetrievalChain
+from langchain.chains import ConversationalRetrievalChain, RetrievalQA
 from langchain_community.chat_models import QianfanChatEndpoint
 
 from server.service.load import get_retrieval
@@ -15,11 +15,12 @@ def get_chain(session_id: str, category: str):
 
     memory = get_conversation_buffer_memory(session_id)
 
-    # 声明一个对话检索式问答链
-    conversation_qa_chain = ConversationalRetrievalChain.from_llm(
+    # 声明一个检索式问答链
+    qa_chain = RetrievalQA.from_llm(
         llm,
         retriever=retrieval,
-        memory=memory
+        memory=memory,
+        # get_chat_history=get_chat_history
     )
 
-    return conversation_qa_chain
+    return qa_chain

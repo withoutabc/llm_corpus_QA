@@ -16,7 +16,8 @@ def get_zep_chat_history(session_id: str):
 
 
 memory = ConversationBufferMemory(
-    memory_key="chat_history", chat_memory=get_zep_chat_history('5d691c6d-fbd6-4237-a9e9-dab260d8410b')
+    memory_key="chat_history",
+    chat_memory=get_zep_chat_history('5d691c6d-fbd6-4237-a9e9-dab260d8410b')
 )
 
 print(memory.chat_memory)

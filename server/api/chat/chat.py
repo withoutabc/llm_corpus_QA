@@ -34,7 +34,7 @@ def create_chat_route(app):
 
         chain = get_chain(session_id, category)
         res = chain.invoke(
-            input={"question": question}
+            input={"query": question}
         )
 
         resp = base_resp(success)
