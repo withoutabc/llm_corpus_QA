@@ -49,22 +49,21 @@ def verify_refresh_token(token):
     except jwt.InvalidTokenError:
         return None  # 无效令牌
 
-
-# 示例使用
-user_id = 123
-access_token = generate_access_token(user_id)
-refresh_token = generate_refresh_token(user_id)
-
-# 验证访问令牌
-user_id_from_access_token = verify_access_token(access_token)
-if user_id_from_access_token:
-    print(f"User ID解析成功: {user_id_from_access_token}")
-else:
-    print("Refresh Token验证失败")
-
-# 示例使用
-user_id_from_refresh_token = verify_refresh_token(refresh_token)
-if user_id_from_refresh_token:
-    print(f"User ID解析成功: {user_id_from_refresh_token}")
-else:
-    print("Refresh Token验证失败")
+# # 示例使用
+# user_id = 123
+# access_token = generate_access_token(user_id)
+# refresh_token = generate_refresh_token(user_id)
+#
+# # 验证访问令牌
+# user_id_from_access_token = verify_access_token(access_token)
+# if user_id_from_access_token:
+#     print(f"User ID解析成功: {user_id_from_access_token}")
+# else:
+#     print("Refresh Token验证失败")
+#
+# # 示例使用
+# user_id_from_refresh_token = verify_refresh_token(refresh_token)
+# if user_id_from_refresh_token:
+#     print(f"User ID解析成功: {user_id_from_refresh_token}")
+# else:
+#     print("Refresh Token验证失败")

@@ -3,13 +3,27 @@ from flask import request, jsonify
 from server.service.history import get_zep_chat_history
 from tools.error import *
 from tools.resp import base_resp
-from tools.memory import *
+from tools.token import verify_access_token
 
 
 # 会话不存在也会返回成功，但是集合为空
 def create_get_history_route(app):
-    @app.route('/memory', methods=['GET'])
+    @app.route('/history', methods=['GET'])
     def get_history_route():
+        # 获取Authorization头部信息
+        authorization_header = request.headers.get('Authorization')
+        # 检查是否有Bearer Token
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            return jsonify(base_resp(unauthorized_error))
+        # 提取Bearer Token
+        access_token = authorization_header.split(' ')[1]
+        # 验证访问令牌
+        user_id_from_access_token = verify_access_token(access_token)
+        if user_id_from_access_token:
+            print(f"User ID解析成功: {user_id_from_access_token}")
+        else:
+            return jsonify(base_resp(token_invalid))
+
         try:
             req = request.get_json()
         except KeyError:
