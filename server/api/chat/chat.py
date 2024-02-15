@@ -1,6 +1,7 @@
 from flask import request
 
 from server.service.chain import get_chain
+from server.service.history import transfer_history, get_zep_chat_history
 from tools.error import *
 from tools.resp import base_resp
 from tools.memory import *
@@ -33,11 +34,19 @@ def create_chat_route(app):
             return jsonify(base_resp(internal_server_error))
 
         chain = get_chain(session_id, category)
+
+        zep_history = get_zep_chat_history(session_id)
+
+        history = transfer_history(zep_history)
+
         res = chain.invoke(
-            input={"query": question}
+            input={"question": question, "chat_history": history}
         )
 
+        zep_history.add_user_message(question)
+        zep_history.add_ai_message(res['answer'])
+
         resp = base_resp(success)
-        data = {"answer": res['result']}
+        data = {"answer": res['answer']}
         resp['data'] = data
         return jsonify(resp)

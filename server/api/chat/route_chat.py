@@ -1,4 +1,4 @@
-from server.api.chat.get_memory import *
+from server.api.chat.get_history import *
 from server.api.chat.chat import *
 
 

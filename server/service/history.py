@@ -3,6 +3,7 @@ import os
 from langchain.memory import ConversationBufferMemory
 from langchain_community.chat_message_histories import ZepChatMessageHistory
 
+
 def get_zep_chat_history(session_id: str):
     zep_chat_history = ZepChatMessageHistory(
         session_id=session_id,
@@ -19,3 +20,14 @@ def get_conversation_buffer_memory(session_id: str):
         chat_memory=get_zep_chat_history(session_id)
     )
     return memory
+
+
+def transfer_history(chat_history: ZepChatMessageHistory):
+    history = []
+    for i in range(0, len(chat_history.zep_messages), 2):
+        pair = (chat_history.zep_messages[i].to_dict()['content'],
+                chat_history.zep_messages[i + 1].to_dict()['content'] if i + 1 < len(
+                    chat_history.zep_messages) else None)
+        history.append(pair)
+    print(history)
+    return history
