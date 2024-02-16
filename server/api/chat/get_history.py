@@ -6,7 +6,6 @@ from tools.resp import base_resp
 from tools.token import verify_access_token
 
 
-# 会话不存在也会返回成功，但是集合为空
 def create_get_history_route(app):
     @app.route('/history', methods=['GET'])
     def get_history_route():
@@ -23,9 +22,12 @@ def create_get_history_route(app):
             print(f"User ID解析成功: {user_id_from_access_token}")
         else:
             return jsonify(base_resp(token_invalid))
-
         try:
             req = request.get_json()
+            session_id = req['session_id']
+            # 验证 session_id 是否为字符串
+            if not isinstance(session_id, str):
+                return jsonify(base_resp(param_error))
         except KeyError:
             print("KeyError")
             return jsonify(base_resp(param_error))
@@ -34,24 +36,15 @@ def create_get_history_route(app):
             return jsonify(base_resp(internal_server_error))
 
         try:
-            session_id = req['session_id']
-            # 验证 session_id 是否为字符串
-            if not isinstance(session_id, str):
-                return jsonify(base_resp(param_error))
-        except KeyError:
-            print("key error")
-            return jsonify(base_resp(param_error))
+            history = get_zep_chat_history(session_id)
+            if history == None:
+                return jsonify(base_resp(session_not_found))
+            resp = base_resp(success)
+            history_ = []
+            for message in history.zep_messages:
+                history_.append(message.to_dict())
+            resp['data'] = history_
+            return jsonify(resp)
         except Exception as e:
             print(f"An error occurred: {e}")
             return jsonify(base_resp(internal_server_error))
-
-        history = get_zep_chat_history(session_id)
-        if history == None:
-            return jsonify(base_resp(session_not_found))
-        resp = base_resp(success)
-
-        history_=[]
-        for message in history.zep_messages:
-            history_.append(message.to_dict())
-        resp['data'] = history_
-        return jsonify(resp)

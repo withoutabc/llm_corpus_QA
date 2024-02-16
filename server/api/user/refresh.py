@@ -15,6 +15,7 @@ def create_refresh_route(app):
         except Exception as e:
             print(f"An error occurred: {e}")
             return jsonify(base_resp(internal_server_error))
+
         try:
             refresh_token = req['refresh_token']
         except KeyError:

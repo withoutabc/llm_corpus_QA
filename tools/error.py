@@ -3,6 +3,7 @@ internal_server_error = "internal server error"
 unauthorized_error = "unauthorized error"
 token_invalid = "token invalid"
 
+wrong_password = 'wrong password'
 user_repeated = 'user repeated'
 user_not_found = "user not found"
 session_not_found = "session not found"
@@ -16,5 +17,6 @@ error_dict = {
     user_not_found: 40001,
     session_not_found: 40002,
     user_repeated: 40003,
+    wrong_password: 40004,
     token_invalid: 20002,
 }
