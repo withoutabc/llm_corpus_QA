@@ -71,7 +71,9 @@ def create_session_route(app):
             print(f"An error occurred: {e}")
             return jsonify(base_resp(internal_server_error))
 
-        return jsonify(sessions_)
+        resp = base_resp(success)
+        resp['data'] = sessions_
+        return jsonify(resp)
 
     @app.route('/session', methods=['DELETE'])
     def delete_session_route():
@@ -105,7 +107,7 @@ def create_session_route(app):
             print(f"An error occurred: {e}")
             return jsonify(base_resp(internal_server_error))
 
-        return jsonify(success)
+        return jsonify(base_resp(success))
 
 
 async def create_session_async(user_id: str, category: str):
