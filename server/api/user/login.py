@@ -18,6 +18,7 @@ def create_login_route(app):
 
         try:
             username = data['username']
+            password = data['password']
         except KeyError:
             print("key error")
             return jsonify(base_resp(param_error))
