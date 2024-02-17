@@ -66,7 +66,7 @@ def create_session_route(app):
             sessions = client.user.get_sessions(user_id_from_access_token)
             sessions_ = []
             for session in sessions:
-                sessions_.append(session)
+                sessions_.append(session.dict())
         except Exception as e:
             print(f"An error occurred: {e}")
             return jsonify(base_resp(internal_server_error))

@@ -11,7 +11,7 @@ from tools.token import *
 
 
 def create_user_route(app):
-    @app.route('/user/register', methods=['GET'])
+    @app.route('/user/register', methods=['POST'])
     def register():
         try:
             req = request.get_json()
@@ -85,6 +85,7 @@ def create_user_route(app):
     def refresh():
         try:
             req = request.get_json()
+            refresh_token = req['refresh_token']
         except KeyError:
             print("KeyError")
             return jsonify(base_resp(param_error))
@@ -92,14 +93,6 @@ def create_user_route(app):
             print(f"An error occurred: {e}")
             return jsonify(base_resp(internal_server_error))
 
-        try:
-            refresh_token = req['refresh_token']
-        except KeyError:
-            print("key error")
-            return jsonify(base_resp(param_error))
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            return jsonify(base_resp(internal_server_error))
         # 验证token
         user_id = verify_refresh_token(refresh_token)
         if user_id:

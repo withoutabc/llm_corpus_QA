@@ -1,8 +1,10 @@
+import os
+
 import jwt
 import datetime
 
 # 密钥，用于签名和验证令牌
-secret_key = "your_secret_key"
+secret_key = os.getenv('SECRET_KEY')
 
 
 # 生成访问令牌
