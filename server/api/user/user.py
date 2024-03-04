@@ -105,3 +105,6 @@ def create_user_route(app):
         resp = base_resp(success)
         resp['data'] = data
         return resp
+    @app.route('/hello', methods=['GET'])
+    def hello():
+        return jsonify(base_resp(success))

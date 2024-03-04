@@ -4,6 +4,7 @@ chromadb~=0.3.29
 openai==1.11.1
 PyJWT==2.8.0
 python-dotenv~=1.0.0
-jwt
+zep_python
+pyjwt
 qianfan
 shortuuid

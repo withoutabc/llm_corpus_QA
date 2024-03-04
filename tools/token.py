@@ -1,7 +1,9 @@
 import os
 
-import jwt
+
 import datetime
+
+import jwt
 
 # 密钥，用于签名和验证令牌
 secret_key = os.getenv('SECRET_KEY')
@@ -30,7 +32,7 @@ def generate_refresh_token(user_id):
 # 验证访问令牌
 def verify_access_token(token):
     try:
-        payload = jwt.decode(token, secret_key, algorithms=["HS256"])
+        payload = jwt.encode(token, secret_key, algorithms=["HS256"])
         user_id = payload.get("user_id")
         return user_id
     except jwt.ExpiredSignatureError:
