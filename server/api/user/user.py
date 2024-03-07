@@ -78,7 +78,7 @@ def create_user_route(app):
                         return jsonify(base_resp(wrong_password))
             return jsonify(base_resp(user_not_found))
         except Exception as e:
-            print(f"An error occurred: {e}")
+            print(f"An error occurred1: {e}")
             return jsonify(base_resp(internal_server_error))
 
     @app.route('/user/refresh', methods=['POST'])
@@ -105,6 +105,7 @@ def create_user_route(app):
         resp = base_resp(success)
         resp['data'] = data
         return resp
+
     @app.route('/hello', methods=['GET'])
     def hello():
         return jsonify(base_resp(success))

@@ -109,6 +109,43 @@ def create_session_route(app):
 
         return jsonify(base_resp(success))
 
+    @app.route('/session/title', methods=['PUT'])
+    def update_session_title_route():
+        # 获取Authorization头部信息
+        authorization_header = request.headers.get('Authorization')
+        # 检查是否有Bearer Token
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            return jsonify(base_resp(unauthorized_error))
+        # 提取Bearer Token
+        access_token = authorization_header.split(' ')[1]
+        # 验证访问令牌
+        user_id_from_access_token = verify_access_token(access_token)
+        if user_id_from_access_token:
+            print(f"User ID解析成功: {user_id_from_access_token}")
+        else:
+            return jsonify(base_resp(token_invalid))
+
+        try:
+            data = request.get_json()
+            session_id = data['session_id']
+            title = data['title']
+        except KeyError:
+            print("KeyError")
+            return jsonify(base_resp(param_error))
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return jsonify(base_resp(internal_server_error))
+
+        try:
+            session = asyncio.run(get_session_async(session_id))
+            session.metadata['title'] = title
+            asyncio.run(update_session_title_async(session, title))
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return jsonify(base_resp(internal_server_error))
+
+        return jsonify(base_resp(success))
+
 
 async def create_session_async(user_id: str, category: str):
     async with ZepClient(base_url=os.getenv('ZEP_API_URL')) as client:
@@ -116,9 +153,19 @@ async def create_session_async(user_id: str, category: str):
         session = Session(
             session_id=session_id,
             user_id=user_id,
-            metadata={'category': category}
+            metadata={'category': category, 'title': '新对话'}
         )
         await client.memory.aadd_session(session)
+
+
+async def get_session_async(session_id: str):
+    async with ZepClient(base_url=os.getenv('ZEP_API_URL')) as client:
+        return await client.memory.aget_session(session_id)
+
+
+async def update_session_title_async(session, title: str):
+    async with ZepClient(base_url=os.getenv('ZEP_API_URL')) as client:
+        await client.memory.aupdate_session(session)
 
 
 async def delete_session_async(session_id: str):

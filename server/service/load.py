@@ -34,39 +34,17 @@ def load_docs():
                     # print(os.path.join(file_path, one_file))
                     # 根据文件路径创建 PyMuPDFLoader 加载器
                     loader = PyMuPDFLoader(os.path.join(file_path, one_file))
-
-                    # 将加载器添加到列表中
-                    loaders.append(loader)
-
-                # 遍历加载器列表
-                for loader in loaders:
-                    # 加载文档并将其添加到文档列表中
                     docs.extend(loader.load())
-
             elif folder_path == 'md':
                 # 遍历文件列表
                 for one_file in files:
                     # 根据文件路径创建 UnstructuredMarkdownLoader 加载器
                     loader = UnstructuredMarkdownLoader(os.path.join(file_path, one_file))
-
-                    # 将加载器添加到列表中
-                    loaders.append(loader)
-
-                # 遍历加载器列表
-                for loader in loaders:
-                    # 加载文档并将其添加到文档列表中
                     docs.extend(loader.load())
-
             elif folder_path == 'txt':
                 for one_file in files:
                     # 根据文件路径创建 UnstructuredMarkdownLoader 加载器
                     loader = TextLoader(os.path.join(file_path, one_file))
-
-                    # 将加载器添加到列表中
-                    loaders.append(loader)
-                # 遍历加载器列表
-                for loader in loaders:
-                    # 加载文档并将其添加到文档列表中
                     docs.extend(loader.load())
 
         docs_dict[dir] = docs
@@ -80,6 +58,7 @@ def load_db(category: str):
     embedding = QianfanEmbeddingsEndpoint(
         streaming=True,
         model="Embedding-V1",
+        chunk_size=16,
     )
     # 加载数据库
     vectordb = Chroma(

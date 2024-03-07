@@ -11,6 +11,7 @@ from server.api.user.user import create_user_route
 
 load_dotenv()
 
+# 设置环境变量
 if __name__ == '__main__':
     app = Flask(__name__)
     create_user_route(app)

@@ -1,15 +1,15 @@
 from langchain.chains import ConversationalRetrievalChain, RetrievalQA
-from langchain_community.chat_models import QianfanChatEndpoint
+
+from langchain_community.chat_models.tongyi import ChatTongyi
 from langchain_core.prompts import PromptTemplate
 
 from server.service.load import get_retrieval
 from server.service.history import get_conversation_buffer_memory
 
 
-def get_chain(session_id: str, category: str):
-    llm = QianfanChatEndpoint(
-        streaming=True,
-        model="ERNIE-Bot",
+def get_chain( category: str):
+    llm = ChatTongyi(
+        model="qwen-max",
     )
 
     retrieval = get_retrieval(category)

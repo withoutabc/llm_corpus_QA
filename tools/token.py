@@ -1,12 +1,9 @@
-import os
-
-
 import datetime
 
 import jwt
 
 # 密钥，用于签名和验证令牌
-secret_key = os.getenv('SECRET_KEY')
+secret_key = 'YJX'
 
 
 # 生成访问令牌
@@ -15,7 +12,7 @@ def generate_access_token(user_id):
         "user_id": user_id,
         "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=15),  # 令牌的过期时间
     }
-    access_token = jwt.encode(payload, secret_key, algorithm="HS256")
+    access_token = jwt.encode(payload, secret_key, algorithm='HS256')
     return access_token
 
 
@@ -25,14 +22,14 @@ def generate_refresh_token(user_id):
         "user_id": user_id,
         "exp": datetime.datetime.utcnow() + datetime.timedelta(days=7),  # 刷新令牌的过期时间
     }
-    refresh_token = jwt.encode(payload, secret_key, algorithm="HS256")
+    refresh_token = jwt.encode(payload, secret_key, algorithm='HS256')
     return refresh_token
 
 
 # 验证访问令牌
 def verify_access_token(token):
     try:
-        payload = jwt.encode(token, secret_key, algorithms=["HS256"])
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = payload.get("user_id")
         return user_id
     except jwt.ExpiredSignatureError:
@@ -45,7 +42,7 @@ def verify_access_token(token):
 # 验证刷新令牌并解析出user_id
 def verify_refresh_token(token):
     try:
-        payload = jwt.decode(token, secret_key, algorithms=["HS256"])
+        payload = jwt.decode(token, secret_key, algorithms=['HS256'])
         user_id = payload.get("user_id")
         return user_id
     except jwt.ExpiredSignatureError:

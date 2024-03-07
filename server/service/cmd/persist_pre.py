@@ -3,8 +3,6 @@ import time
 
 from langchain_community.embeddings import QianfanEmbeddingsEndpoint
 from langchain_community.vectorstores.chroma import Chroma
-from langchain_core.documents import Document
-
 from server.service.split import split_docs
 
 from server.service.load import load_docs
@@ -21,13 +19,6 @@ def persist_vector_db(category: str, s_docs):
     base_directory = '../../../data_base/'
     # 定义持久化路径
     persist_directory = os.path.join(base_directory, category)
-    doc = Document(page_content="无", metadata={"page": "1"})
-    vectordb = Chroma.from_documents(
-        documents=split_docs(([doc])),
-        collection_name=category,
-        embedding=embedding,
-        persist_directory=persist_directory,  # 允许我们将persist_directory目录保存到磁盘上
-    )
     right = 0
     error = 0
     for doc in s_docs:
@@ -35,20 +26,22 @@ def persist_vector_db(category: str, s_docs):
             continue
         # 加载数据库
         try:
-            vectordb.add_documents(documents=split_docs(([doc])))
+            vectordb = Chroma.from_documents(
+                documents=split_docs([(doc)]),
+                embedding=embedding,
+                persist_directory=persist_directory  # 允许我们将persist_directory目录保存到磁盘上
+            )
+            # 向量数据库持久化
+            vectordb.persist()
         except Exception as e:
             error = error + 1
             print(doc)
-            print(f"--------------------------------------------\n"
-                  f"An error occured: {e}\n"
-                  f"--------------------------------------------")
+            print(f"An error occured: {e}")
             time.sleep(5)
             continue
         right = right + 1
     print(f"right:{right}")
     print(f"error:{error}")
-    print("向量数据库持久化中...")
-    vectordb.persist()
 
 
 if __name__ == '__main__':
