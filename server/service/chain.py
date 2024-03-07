@@ -7,7 +7,7 @@ from server.service.load import get_retrieval
 from server.service.history import get_conversation_buffer_memory
 
 
-def get_chain( category: str):
+def get_chain(category: str):
     llm = ChatTongyi(
         model="qwen-max",
     )
@@ -17,7 +17,9 @@ def get_chain( category: str):
     # 声明一个检索式问答链
     qa_chain = ConversationalRetrievalChain.from_llm(
         llm,
+        chain_type="stuff",
         retriever=retrieval,
+        verbose=True
         # get_chat_history=get_chat_history
     )
 

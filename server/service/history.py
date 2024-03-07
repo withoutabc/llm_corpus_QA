@@ -10,7 +10,7 @@ def get_zep_chat_history(session_id: str):
         url=os.getenv('ZEP_API_URL'),
         # api_key=os.getenv('OPENAI_API_KEY'),
     )
-    print(zep_chat_history.zep_messages)
+    # print(zep_chat_history.zep_messages)
     return zep_chat_history
 
 
@@ -29,5 +29,4 @@ def transfer_history(chat_history: ZepChatMessageHistory):
                 chat_history.zep_messages[i + 1].to_dict()['content'] if i + 1 < len(
                     chat_history.zep_messages) else None)
         history.append(pair)
-    print(history)
     return history

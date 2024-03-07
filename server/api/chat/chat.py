@@ -47,7 +47,7 @@ def create_chat_route(app):
             print(f"An error occurred: {e}")
             return jsonify(base_resp(internal_server_error))
 
-        chain = get_chain(session_id, category)
+        chain = get_chain(category)
 
         zep_history = get_zep_chat_history(session_id)
 
