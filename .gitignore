@@ -2,3 +2,5 @@
 /.idea
 /knowledge_db
 /data_base
+.ipynb_checkpoints
+/stream
