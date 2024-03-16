@@ -1,6 +1,12 @@
-from flask import request, jsonify, Response
+import sys
 
-from server.service.history import transfer_history, get_zep_chat_history
+from flask import request, jsonify, Response
+from langchain.chains import LLMChain
+from langchain_community.chat_models import QianfanChatEndpoint
+from langchain_core.prompts import PromptTemplate
+
+from server.service.history import get_zep_chat_history
+# from server.service.history import transfer_history, get_zep_chat_history
 from server.service.streaming import chain
 from tools.error import *
 from tools.resp import base_resp
@@ -47,12 +53,31 @@ def create_chat_route(app):
             print(f"An error occurred: {e}")
             return jsonify(base_resp(internal_server_error))
 
-        zep_history = get_zep_chat_history(session_id)
-        history = transfer_history(zep_history)
+        # 获取历史消息
+        zep_history, history = get_zep_chat_history(session_id)
+        # history = transfer_history(zep_history)
         print(history)
+
+        # 添加问题
         zep_history.add_user_message(question)
-        # zep_history.add_ai_message(res['answer'])
-        return Response(chain(category, question, history), mimetype='text/event-stream')
+
+        template = (
+            "Combine the chat history and follow up question into "
+            "a standalone question. Chat History: {chat_history}"
+            "Follow up question: {question}"
+            "A standalone question:"
+        )
+        prompt = PromptTemplate.from_template(template)
+        llm = QianfanChatEndpoint(
+            streaming=True,
+            model="ERNIE-Bot",
+        )
+        q_gen_chain = LLMChain(llm=llm, prompt=prompt)
+        res = q_gen_chain({"chat_history": history, "question": question})
+        q_gen = res['text']
+        print(q_gen)
+
+        return Response(chain(category, q_gen), mimetype='text/event-stream')
 
     @app.route('/message', methods=['POST'])
     def add_message_route():
@@ -68,7 +93,10 @@ def create_chat_route(app):
         try:
             session_id = req['session_id']
             answer = req['answer']
-            zep_history = get_zep_chat_history(session_id)
+            # 获取历史消息
+            zep_history, history = get_zep_chat_history(session_id)
+
+            # 添加问题
             zep_history.add_ai_message(answer)
             # 验证 session_id 是否为字符串
             if not isinstance(session_id, str):

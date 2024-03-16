@@ -1,7 +1,7 @@
 import queue
 import threading
 
-from langchain.chains import ConversationalRetrievalChain
+from langchain.chains import ConversationalRetrievalChain, RetrievalQA
 from langchain_community.chat_models import QianfanChatEndpoint
 from langchain_community.chat_models.tongyi import ChatTongyi
 from langchain_core.callbacks import StreamingStdOutCallbackHandler
@@ -37,25 +37,24 @@ class ChainStreamHandler(StreamingStdOutCallbackHandler):
         self.gen.send(token)
 
 
-def llm_thread(g, cat, question, chat_history):
+def llm_thread(g, cat, question):
     try:
         llm = QianfanChatEndpoint(
             streaming=True,
             model="ERNIE-Bot",
             callbacks=[ChainStreamHandler(g)]
         )
-        chain = ConversationalRetrievalChain.from_llm(
+        chain = RetrievalQA.from_llm(
             llm,
-            chain_type="stuff",
             retriever=get_retrieval(cat),
             verbose=True,
         )
-        chain({"question": question, "chat_history": chat_history})
+        chain({"query": question})
     finally:
         g.close()
 
 
-def chain(cat, question, chat_history):
+def chain(cat, question):
     g = ThreadedGenerator()
-    threading.Thread(target=llm_thread, args=(g, cat, question, chat_history)).start()
+    threading.Thread(target=llm_thread, args=(g, cat, question)).start()
     return g
