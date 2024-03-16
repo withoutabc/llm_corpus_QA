@@ -2,6 +2,7 @@ import queue
 import threading
 
 from langchain.chains import ConversationalRetrievalChain
+from langchain_community.chat_models import QianfanChatEndpoint
 from langchain_community.chat_models.tongyi import ChatTongyi
 from langchain_core.callbacks import StreamingStdOutCallbackHandler
 
@@ -38,10 +39,10 @@ class ChainStreamHandler(StreamingStdOutCallbackHandler):
 
 def llm_thread(g, cat, question, chat_history):
     try:
-        llm = ChatTongyi(
-            callbacks=[ChainStreamHandler(g)],
-            model="qwen-max",
-            streaming=True
+        llm = QianfanChatEndpoint(
+            streaming=True,
+            model="ERNIE-Bot",
+            callbacks=[ChainStreamHandler(g)]
         )
         chain = ConversationalRetrievalChain.from_llm(
             llm,

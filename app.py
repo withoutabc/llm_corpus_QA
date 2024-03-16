@@ -16,4 +16,4 @@ if __name__ == '__main__':
     create_user_route(app)
     create_chat_route(app)
     create_session_route(app)
-    app.run(host='0.0.0.0', threaded=True, port=5000, debug=True)
+    app.run(threaded=True, debug=True, port=5000, host='0.0.0.0')

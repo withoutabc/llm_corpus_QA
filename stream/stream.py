@@ -5,9 +5,11 @@ from dotenv import load_dotenv
 from flask import Flask, request, Response
 from flask_cors import CORS
 from langchain.chains import ConversationalRetrievalChain
-from langchain_community.chat_models.tongyi import ChatTongyi
+from langchain_community.chat_models import QianfanChatEndpoint
 from langchain_core.output_parsers import StrOutputParser
 
+# 加载环境变量
+load_dotenv()
 from server.service.load import get_retrieval
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
@@ -43,17 +45,17 @@ class ChainStreamHandler(StreamingStdOutCallbackHandler):
         self.gen.send(token)
 
 
-def llm_thread(g, cat,question, chat_history):
+def llm_thread(g, question, chat_history):
     try:
-        llm = ChatTongyi(
+        llm = QianfanChatEndpoint(
             callbacks=[ChainStreamHandler(g)],
-            model="qwen-max",
-            streaming=True
+            streaming=True,
+            model="ERNIE-Bot",
         )
         chain = ConversationalRetrievalChain.from_llm(
             llm,
             chain_type="stuff",
-            retriever=get_retrieval(cat),
+            retriever=get_retrieval('food'),
             verbose=True,
             # get_chat_history=get_chat_history
         )
@@ -68,10 +70,18 @@ def chain(question, chat_history):
     return g
 
 
+def process_data(data):
+    global answer
+    # 对总体答案进行操作的逻辑
+    # ...
+    answer = data
+
+
 @app.route('/chain', methods=['POST'])
 def _chain():
     question = '重庆有哪些好玩的地方,100字以上'
-    return Response(chain(question, []), mimetype='text/event-stream')
+    response = Response(chain(question, ()), mimetype='text/event-stream')
+    return response
 
 
 @app.route('/')
@@ -96,17 +106,18 @@ def index():
             outputEl.innerText = '';
             aborter = new AbortController();
             const prompt = new FormData(formEl).get('prompt');
+            const requestData = {
+    prompt:"prompt"
+};
             try {
                 const response = await fetch(
-                    'http://192.168.223.26:5000/chain', {
+                    'http://localhost:5000/chain', {
                         signal: aborter.signal,
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            prompt
-                        }),
+                        headers: {'Content-Type': 'application/json',
+                        body: JSON.stringify({}),
                     }
-                );
+                });
                 console.log(222);
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
@@ -132,5 +143,15 @@ def index():
 ''', mimetype='text/html')
 
 
+def print_answer():
+    global answer
+    while True:
+        if answer != "":
+            print("总体答案:", answer)
+            answer = ""  # 清空答案
+        # 可以添加适当的延时，避免过于频繁地检查答案
+
+
 if __name__ == '__main__':
+    threading.Thread(target=print_answer).start()  # 启动打印答案的线程
     app.run(threaded=True, debug=True, port=5000, host='0.0.0.0')

@@ -49,7 +49,7 @@ def create_chat_route(app):
 
         zep_history = get_zep_chat_history(session_id)
         history = transfer_history(zep_history)
-
+        print(history)
         zep_history.add_user_message(question)
         # zep_history.add_ai_message(res['answer'])
         return Response(chain(category, question, history), mimetype='text/event-stream')
