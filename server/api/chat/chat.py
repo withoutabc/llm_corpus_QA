@@ -1,12 +1,6 @@
-import sys
-
 from flask import request, jsonify, Response
-from langchain.chains import LLMChain
-from langchain_community.chat_models import QianfanChatEndpoint
-from langchain_core.prompts import PromptTemplate
 
 from server.service.history import get_zep_chat_history
-# from server.service.history import transfer_history, get_zep_chat_history
 from server.service.streaming import chain
 from tools.error import *
 from tools.resp import base_resp
@@ -61,23 +55,7 @@ def create_chat_route(app):
         # 添加问题
         zep_history.add_user_message(question)
 
-        template = (
-            "Combine the chat history and follow up question into "
-            "a standalone question. Chat History: {chat_history}"
-            "Follow up question: {question}"
-            "A standalone question:"
-        )
-        prompt = PromptTemplate.from_template(template)
-        llm = QianfanChatEndpoint(
-            streaming=True,
-            model="ERNIE-Bot",
-        )
-        q_gen_chain = LLMChain(llm=llm, prompt=prompt)
-        res = q_gen_chain({"chat_history": history, "question": question})
-        q_gen = res['text']
-        print(q_gen)
-
-        return Response(chain(category, q_gen), mimetype='text/event-stream')
+        return Response(chain(category, question, history), mimetype='text/event-stream')
 
     @app.route('/message', methods=['POST'])
     def add_message_route():
@@ -139,12 +117,12 @@ def create_chat_route(app):
             return jsonify(base_resp(internal_server_error))
 
         try:
-            history = get_zep_chat_history(session_id)
+            zep_history, history = get_zep_chat_history(session_id)
             if history == None:
                 return jsonify(base_resp(session_not_found))
             resp = base_resp(success)
             history_ = []
-            for message in history.zep_messages:
+            for message in zep_history.zep_messages:
                 history_.append(message.to_dict())
             resp['data'] = history_
             return jsonify(resp)

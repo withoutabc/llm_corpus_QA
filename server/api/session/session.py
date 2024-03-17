@@ -38,12 +38,14 @@ def create_session_route(app):
             return jsonify(base_resp(internal_server_error))
 
         try:
-            asyncio.run(create_session_async(user_id_from_access_token, category))
+            session_id = asyncio.run(create_session_async(user_id_from_access_token, category))
         except Exception as e:
             print(f"An error occurred: {e}")
             return jsonify(base_resp(internal_server_error))
 
-        return jsonify(base_resp(success))
+        resp = base_resp(success)
+        resp["data"] = {"session_id": session_id}
+        return jsonify(resp)
 
     @app.route('/session', methods=['GET'])
     def get_session_route():
@@ -156,6 +158,7 @@ async def create_session_async(user_id: str, category: str):
             metadata={'category': category, 'title': '新对话'}
         )
         await client.memory.aadd_session(session)
+    return session_id
 
 
 async def get_session_async(session_id: str):
