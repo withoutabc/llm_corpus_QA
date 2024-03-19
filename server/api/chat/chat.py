@@ -1,4 +1,9 @@
+import asyncio
+import os
+from datetime import datetime
+
 from flask import request, jsonify, Response
+from zep_python import NotFoundError, ZepClient
 
 from server.service.history import get_zep_chat_history
 from server.service.streaming import chain
@@ -53,7 +58,7 @@ def create_chat_route(app):
         print(history)
 
         # 添加问题
-        zep_history.add_user_message(question)
+        zep_history.add_user_message(message=question, metadata={"delete_at": ""})
 
         return Response(chain(category, question, history), mimetype='text/event-stream')
 
@@ -73,9 +78,8 @@ def create_chat_route(app):
             answer = req['answer']
             # 获取历史消息
             zep_history, history = get_zep_chat_history(session_id)
-
             # 添加问题
-            zep_history.add_ai_message(answer)
+            zep_history.add_ai_message(message=answer, metadata={"delete_at": ""})
             # 验证 session_id 是否为字符串
             if not isinstance(session_id, str):
                 return jsonify(base_resp(param_error))
@@ -129,3 +133,48 @@ def create_chat_route(app):
         except Exception as e:
             print(f"An error occurred: {e}")
             return jsonify(base_resp(internal_server_error))
+
+    @app.route('/message', methods=['DELETE'])
+    def delete_message_route():
+        # 获取Authorization头部信息
+        authorization_header = request.headers.get('Authorization')
+        # 检查是否有Bearer Token
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            return jsonify(base_resp(unauthorized_error))
+        # 提取Bearer Token
+        access_token = authorization_header.split(' ')[1]
+        # 验证访问令牌
+        user_id_from_access_token = verify_access_token(access_token)
+        if user_id_from_access_token:
+            print(f"User ID解析成功: {user_id_from_access_token}")
+        else:
+            return jsonify(base_resp(token_invalid))
+
+        try:
+            req = request.get_json()
+            session_id = req['session_id']
+            message_id = req['message_id']
+        except KeyError:
+            print("KeyError")
+            return jsonify(base_resp(param_error))
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return jsonify(base_resp(param_error))
+
+        try:
+            asyncio.run(delete_message_async(session_id, message_id))
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return jsonify(base_resp(internal_server_error))
+
+        return jsonify(base_resp(success))
+
+
+async def delete_message_async(session_id: str, message_id: str):
+    async with ZepClient(base_url=os.getenv('ZEP_API_URL')) as client:
+        metadata = {
+            "metadata": {"delete_at": str(datetime.now())}
+        }
+        await client.message.aupdate_message_metadata(session_id, message_id, metadata)
+    # except NotFoundError:
+    #     print("Session not found")

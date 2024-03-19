@@ -13,8 +13,13 @@ def get_zep_chat_history(session_id: str):
     # print(zep_chat_history.zep_messages)
     history = []
     for message in zep_chat_history.zep_messages:
-        history.append(message.role + ':' + message.content)
-    return zep_chat_history,"\n".join(history)
+        if message.metadata['delete_at'] != "":
+            continue
+        if message.role == 'human':
+            history.append("Human:" + message.content)
+        if message.role == 'ai':
+            history.append("Assistant:" + message.content)
+    return zep_chat_history, "\n".join(history)
 
 # def get_conversation_buffer_memory(session_id: str):
 #     memory = ConversationBufferMemory(
